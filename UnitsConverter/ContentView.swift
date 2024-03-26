@@ -8,14 +8,79 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+    @State private var temperature = 0.0
+    @State private var tempFromUnit = "°C"
+    @State private var tempToUnit = "°F"
+
+    @FocusState private var temperatureIsFocused: Bool
+
+    let unitCelsius = "°C"
+    let unitFahrenheit = "°F"
+    let unitKelvin = "K"
+
+    var convertedTemp: Double {
+        switch true {
+        case tempFromUnit == tempToUnit:
+            return temperature
+        case tempFromUnit == unitCelsius && tempToUnit == unitFahrenheit:
+            return 9/5 * temperature + 32
+        case tempFromUnit == unitCelsius && tempToUnit == unitKelvin:
+            return temperature + 273.15
+        case tempFromUnit == unitFahrenheit && tempToUnit == unitCelsius:
+            return (temperature - 32) * 5/9
+        case tempFromUnit == unitFahrenheit && tempToUnit == unitKelvin:
+            return (temperature - 32) * 5/9 + 273.15
+        case tempFromUnit == unitKelvin && tempToUnit == unitCelsius:
+            return temperature - 273.15
+        case tempFromUnit == unitKelvin && tempToUnit == unitFahrenheit:
+            return 9/5 * (temperature - 273.15) + 32
+        default:
+            return 0.0
         }
-        .padding()
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                let temperatureUnits = [unitCelsius, unitFahrenheit, unitKelvin]
+
+                Section("Temperature") {
+                    TextField("Temperature", value: $temperature, format: .number)
+                        .keyboardType(.decimalPad)
+                        .focused($temperatureIsFocused)
+                }
+
+                Section("Convert from") {
+                    Picker("Source temperature unit", selection: $tempFromUnit) {
+                        ForEach(temperatureUnits, id: \.self) {
+                            Text($0)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+
+                Section("Convert to") {
+                    Picker("Target temperature unit", selection: $tempToUnit) {
+                        ForEach(temperatureUnits, id: \.self) {
+                            Text($0)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+
+                Section("\(temperature.formatted()) \(tempFromUnit) in \(tempToUnit)") {
+                    // round to two decimal places
+                    Text("\(((convertedTemp * 100).rounded() / 100).formatted())")
+                }
+            }
+            .toolbar {
+                if temperatureIsFocused {
+                    Button("Done") {
+                        temperatureIsFocused = false
+                    }
+                }
+            }
+        }
     }
 }
 
