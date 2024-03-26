@@ -18,22 +18,27 @@ struct ContentView: View {
     let unitFahrenheit = "°F"
     let unitKelvin = "K"
 
+    // convert input temperature to Celsius
+    func normalizeInputTemp() -> Double {
+        switch tempFromUnit {
+        case unitFahrenheit:
+            return (temperature - 32) * 5/9
+        case unitKelvin:
+            return temperature - 273.15
+        default:
+            return temperature
+        }
+    }
+
     var convertedTemp: Double {
+        let normalizedInputTemp = normalizeInputTemp()
         switch true {
         case tempFromUnit == tempToUnit:
             return temperature
-        case tempFromUnit == unitCelsius && tempToUnit == unitFahrenheit:
-            return 9/5 * temperature + 32
-        case tempFromUnit == unitCelsius && tempToUnit == unitKelvin:
-            return temperature + 273.15
-        case tempFromUnit == unitFahrenheit && tempToUnit == unitCelsius:
-            return (temperature - 32) * 5/9
-        case tempFromUnit == unitFahrenheit && tempToUnit == unitKelvin:
-            return (temperature - 32) * 5/9 + 273.15
-        case tempFromUnit == unitKelvin && tempToUnit == unitCelsius:
-            return temperature - 273.15
-        case tempFromUnit == unitKelvin && tempToUnit == unitFahrenheit:
-            return 9/5 * (temperature - 273.15) + 32
+        case tempToUnit == unitFahrenheit:
+            return 9/5 * normalizedInputTemp + 32
+        case tempToUnit == unitKelvin:
+            return normalizedInputTemp + 273.15
         default:
             return 0.0
         }
