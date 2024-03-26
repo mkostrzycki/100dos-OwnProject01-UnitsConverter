@@ -39,6 +39,10 @@ struct ContentView: View {
         }
     }
 
+    var displayEasterEgg: Bool {
+        return tempFromUnit == unitFahrenheit && temperature == 451
+    }
+
     var body: some View {
         NavigationStack {
             Form {
@@ -71,6 +75,12 @@ struct ContentView: View {
                 Section("\(temperature.formatted()) \(tempFromUnit) in \(tempToUnit)") {
                     // round to two decimal places
                     Text("\(((convertedTemp * 100).rounded() / 100).formatted())")
+                }
+
+                if displayEasterEgg {
+                    Section("Fahrenheit 451") {
+                        Text("There must be something in books, things we can’t imagine, to make a woman stay in a burning house; there must be something there. You don’t stay for nothing.")
+                    }
                 }
             }
             .toolbar {
